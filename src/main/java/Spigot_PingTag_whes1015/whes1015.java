@@ -1,65 +1,54 @@
 package Spigot_PingTag_whes1015;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class whes1015 extends JavaPlugin implements Listener {
 
-    int vercode=100;
-    String vername="V 1.0.0-beta";
+    String vername="1.0.0-stable";
 
     @Override
     public void onEnable() {
+        String webPage = "https://api.github.com/repos/ExpTechTW/Spigot-PingTag/releases";
 
-        URL url = null;
+        InputStream is = null;
         try {
-            url = new URL("http://exptech.mywire.org/Spigot_PingTag.php");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        HttpURLConnection http = null;
-        try {
-            assert url != null;
-            http = (HttpURLConnection) url.openConnection();
+            is = new URL(webPage).openStream();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try {
-            assert http != null;
-            http.setRequestMethod("GET");
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        }
-        try {
-            InputStream input = http.getInputStream();
-            byte[] data = new byte[1024];
-            int idx = input.read(data);
-            String str = new String(data, 0, idx);
-            int x = Integer.parseInt(str);
-            if(vercode < x) {
+        Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
+        JsonElement jsonElement = new JsonParser().parse(reader);
+        JsonArray jsonArray = jsonElement.getAsJsonArray();
+        JsonObject jsonObject = (JsonObject) jsonArray.get(0);
+        saveDefaultConfig();
+        if (jsonObject.get("tag_name").toString() != vername) {
+            if ((getConfig().getString("BetaVersion") == "true" && jsonObject.get("prerelease").getAsBoolean() == true) || (getConfig().getString("BetaVersion") == "false" && jsonObject.get("prerelease").getAsBoolean() == false)) {
                 this.getLogger().info("Please Update Your Plugin! "+vername);
-                this.getLogger().info( "DownloadLink: https://github.com/ExpTech-tw/Spigot-PingTag/tags");
+                this.getLogger().info( "DownloadLink: https://github.com/ExpTech-tw/Spigot-PingTag/releases");
                 this.getPluginLoader().disablePlugin(this);
-            }else{
+            } else {
                 this.getLogger().info("Spigot_PingTag Update Checking Success! "+vername);
                 this.getLogger().info("Spigot_PingTag Loading Success! - Designed by ExpTech.tw (whes1015) "+vername);
                 this.getServer().getPluginManager().registerEvents(this, this);
             }
-            input.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            this.getLogger().info("Spigot_PingTag Update Checking Success! "+vername);
+            this.getLogger().info("Spigot_PingTag Loading Success! - Designed by ExpTech.tw (whes1015) "+vername);
+            this.getServer().getPluginManager().registerEvents(this, this);
         }
-        http.disconnect();
-
     }
 
     @EventHandler
