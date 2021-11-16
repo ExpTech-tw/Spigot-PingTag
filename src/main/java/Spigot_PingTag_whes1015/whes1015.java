@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 public class whes1015 extends JavaPlugin implements Listener {
 
-    String vername="1.0.0-stable";
+    String vername="21w46";
 
     @Override
     public void onEnable() {
@@ -37,7 +37,7 @@ public class whes1015 extends JavaPlugin implements Listener {
         if (jsonObject.get("tag_name").toString() != vername) {
             if ((getConfig().getString("BetaVersion") == "true" && jsonObject.get("prerelease").getAsBoolean() == true) || (getConfig().getString("BetaVersion") == "false" && jsonObject.get("prerelease").getAsBoolean() == false)) {
                 this.getLogger().info("Please Update Your Plugin! "+vername);
-                this.getLogger().info( "DownloadLink: https://github.com/ExpTech-tw/Spigot-PingTag/releases");
+                this.getLogger().info( "DownloadLink: https://github.com/ExpTechTW/Spigot-PingTag/releases");
                 this.getPluginLoader().disablePlugin(this);
             } else {
                 this.getLogger().info("Spigot_PingTag Update Checking Success! "+vername);
